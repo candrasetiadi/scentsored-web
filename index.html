@@ -3283,13 +3283,10 @@
 
     function submitBooking(payload) {
       if (!CONFIG.BOOKING_API_URL) return Promise.resolve();
-      // GAS web app memerlukan Content-Type: text/plain agar tidak trigger CORS preflight
-      return fetch(CONFIG.BOOKING_API_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload)
-      }).catch(err => console.warn('Booking submit failed:', err));
+      // GAS web app: gunakan GET + URLSearchParams untuk menghindari CORS redirect issue pada POST
+      const params = new URLSearchParams({ action: 'submit', data: JSON.stringify(payload) });
+      return fetch(CONFIG.BOOKING_API_URL + '?' + params.toString())
+        .catch(err => console.warn('Booking submit failed:', err));
     }
 
     function toggleCustomCountry(val) {
